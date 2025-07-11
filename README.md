@@ -1,6 +1,9 @@
+
+---
+
 ### 🔧 **Project Overview**
 
-Provision an S3 bucket in each environment (`dev`, `staging`, `prod`) that triggers a Lambda function when new files are uploaded.
+Provision an S3 bucket in each environment (`dev`, `staging`, `prod`) that triggers a Lambda function when new files are uploaded. Each environment has a **dedicated IAM user** who is allowed to drop files into the respective S3 bucket, triggering the `ObjectCreated` event.
 
 ---
 
@@ -11,11 +14,12 @@ terraform-project/
 │
 ├── modules/
 │   ├── s3/
-│   │   └── main.tf
 │   ├── lambda/
+│   ├── event/
+│   ├── iam_user/
 │   │   └── main.tf
-│   └── event/
-│       └── main.tf
+│   │   └── outputs.tf
+│   │   └── variables.tf
 │
 ├── environments/
 │   ├── dev/
@@ -45,6 +49,7 @@ Each module does one thing:
 * `s3`: Creates the S3 bucket.
 * `lambda`: Creates a basic Lambda function (with placeholder or inline code).
 * `event`: Sets up S3 → Lambda trigger using `aws_s3_bucket_notification`.
+* `iam_user`: Creates a dedicated IAM user per environment with `s3:PutObject` permission to the corresponding S3 bucket. This user is intended to upload files and trigger the Lambda.
 
 ---
 
@@ -52,9 +57,17 @@ Each module does one thing:
 
 Each environment uses the same modules with different `terraform.tfvars` values:
 
-* Bucket name suffix
+* Unique bucket name (e.g., `my-bucket-dev`)
 * Lambda function name
+* IAM username (e.g., `uploader-dev`)
 * Region, if needed
+
+Each environment creates:
+
+* 1 S3 bucket
+* 1 Lambda function
+* 1 IAM user with S3 write access
+* 1 S3 → Lambda trigger
 
 ---
 
@@ -65,5 +78,7 @@ We'll create a pipeline that does the following:
 * On `main` branch push: deploy to `dev`
 * On PR merge to `staging`: deploy to `staging`
 * On release tag: deploy to `prod`
+
+Access credentials (`access_key`, `secret_access_key`) for the uploader IAM users can be securely stored in secrets management tools (e.g., AWS Secrets Manager, Vault, or CI/CD secrets).
 
 ---
