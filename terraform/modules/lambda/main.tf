@@ -13,7 +13,8 @@ resource "aws_iam_role" "lambda_invoke_role" {
                 "Action": "sts:AssumeRole"
             }
         ]
-    }EOF
+    }
+    EOF
 }
 
 # attach role to an execution policy
