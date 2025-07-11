@@ -8,6 +8,7 @@ module "iam_user"{
 module "lambda_function"{
     source = "../../modules/lambda"
     lambda_function_name = "staging-lambda-function"
+    lambda_invoke_role_name = "staging-lambda-invoke-role"
 }
 
 module "s3_bucket"{
