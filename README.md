@@ -1,84 +1,101 @@
+Here’s an updated and polished version of your `README.md`, incorporating your latest points about DRY principles, Terragrunt benefits, and managing remote state:
+
+---
+
+## 🚀 **Terraform S3 + Lambda Event Trigger with Terragrunt**
 
 ---
 
 ### 🔧 **Project Overview**
 
-Provision an S3 bucket in each environment (`dev`, `staging`, `prod`) that triggers a Lambda function when new files are uploaded. Each environment has a **dedicated IAM user** who is allowed to drop files into the respective S3 bucket, triggering the `ObjectCreated` event.
+Provision an **S3 bucket** in each environment (`dev`, `staging`, `prod`) that triggers a **Lambda function** when new files are uploaded. Each environment has a **dedicated IAM user** who is authorized to upload files to the respective S3 bucket, triggering an `ObjectCreated` event.
+
+Built with **Terragrunt** to enforce **DRY principles**, centralize backend and provider configurations, and manage environment-specific stacks easily.
 
 ---
 
-### 📁 **Directory Structure (DRY & Modular)**
+### 📁 **Directory Structure (Modular & DRY)**
 
 ```bash
 terraform-project/
 │
-├── modules/
-│   ├── s3/
-│   ├── lambda/
-│   ├── event/
-│   ├── iam_user/
-│   │   └── main.tf
-│   │   └── outputs.tf
+├── modules/                      # Reusable Terraform modules
+│   ├── s3/                       # S3 bucket creation
+│   ├── lambda/                   # Lambda function definition
+│   ├── event/                    # S3 → Lambda trigger setup
+│   ├── iam_user/                 # IAM user with S3 upload permissions
+│   │   ├── main.tf
+│   │   ├── outputs.tf
 │   │   └── variables.tf
 │
-├── environments/
+├── environments/                # Environment-specific configurations
 │   ├── dev/
-│   │   └── main.tf
-│   │   └── terraform.tfvars
+│   │   ├── main.tf
+│   │   └── terragrunt.hcl
 │   ├── staging/
-│   │   └── main.tf
-│   │   └── terraform.tfvars
+│   │   ├── main.tf
+│   │   └── terragrunt.hcl
 │   └── prod/
-│       └── main.tf
-│       └── terraform.tfvars
+│       ├── main.tf
+│       └── terragrunt.hcl
 │
-├── shared/
-│   └── provider.tf
-│   └── backend.tf
+├── root.hcl                     # Root Terragrunt configuration
 │
 └── pipeline/
-    └── ci-cd.yml  # GitHub Actions or GitLab CI
+    └── ci-cd.yml                # GitHub Actions or GitLab CI pipeline
 ```
 
 ---
 
 ### 🧱 **Modules**
 
-Each module does one thing:
+Each module encapsulates a single responsibility:
 
-* `s3`: Creates the S3 bucket.
-* `lambda`: Creates a basic Lambda function (with placeholder or inline code).
-* `event`: Sets up S3 → Lambda trigger using `aws_s3_bucket_notification`.
-* `iam_user`: Creates a dedicated IAM user per environment with `s3:PutObject` permission to the corresponding S3 bucket. This user is intended to upload files and trigger the Lambda.
+* `s3`: Creates a versioned S3 bucket.
+* `lambda`: Defines a Lambda function with placeholder code.
+* `event`: Sets up the bucket → Lambda trigger.
+* `iam_user`: Creates an IAM user with `s3:PutObject` permissions for the specific bucket.
 
 ---
 
-### ⚙️ **Environments**
+#### 💡 Terragrunt DRY Principle
 
-Each environment uses the same modules with different `terraform.tfvars` values:
+Terragrunt allows you to define shared configurations (like remote state and providers) in `root.hcl`, and it **generates `backend.tf` automatically** per environment.
 
-* Unique bucket name (e.g., `my-bucket-dev`)
-* Lambda function name
-* IAM username (e.g., `uploader-dev`)
-* Region, if needed
+If you already have a state file tracking resources (like in `dev`), **Terragrunt will overwrite the backend configuration** if `if_exists = "overwrite_terragrunt"` is set. For untracked modules, it just works.
 
-Each environment creates:
+---
 
-* 1 S3 bucket
-* 1 Lambda function
-* 1 IAM user with S3 write access
-* 1 S3 → Lambda trigger
+### 🧠 **Why Terragrunt Rocks**
+
+* Treats each environment as a **stack** using `terragrunt.hcl` files.
+* Supports `run-all` commands for multi-environment workflows.
+* Eliminates copy-pasting backend/provider blocks.
+* Great for managing **remote state** and consistent deployments.
+
+You can deploy everything from the root with:
+
+```bash
+cd terraform-project/
+terragrunt run-all apply
+```
+
+And tear down everything with:
+
+```bash
+terragrunt run-all destroy
+```
 
 ---
 
 ### 🔄 **CI/CD Pipeline**
 
-We'll create a pipeline that does the following:
+A sample pipeline could:
 
-* On `main` branch push: deploy to `dev`
-* On PR merge to `staging`: deploy to `staging`
-* On release tag: deploy to `prod`
+* Deploy to **`dev`** on `main` branch push
+* Deploy to **`staging`** on PR merge
+* Deploy to **`prod`** on release tag
 
-Access credentials (`access_key`, `secret_access_key`) for the uploader IAM users can be securely stored in secrets management tools (e.g., AWS Secrets Manager, Vault, or CI/CD secrets).
+**Secrets**, such as IAM access keys, should be stored securely (e.g., GitHub Secrets, AWS Secrets Manager, Vault).
 
 ---

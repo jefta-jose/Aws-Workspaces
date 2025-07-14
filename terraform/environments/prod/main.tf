@@ -12,7 +12,7 @@ module "lambda_function"{
 }
 
 module "s3_bucket"{
-    source = "../../modules/s3_bucket"
+    source = "../../modules/s3"
     bucket_name = "jeff-ndegwa-254-prod-s3-bucket"
     s3_bucket_access_policy_name = "jeff-ndegwa-254-prod-s3-policy"
     user_name = module.iam_user.s3_upload_user_name
