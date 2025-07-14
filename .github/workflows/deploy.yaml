@@ -1,6 +1,6 @@
 # github action code to deploy code in different environments
 
-name: 'Deploy to Environment'
+name: 'Deploy Resources'
 
 on:
   workflow_dispatch:
@@ -30,9 +30,9 @@ defaults:
     shell: bash
 
 jobs:
-  validate:
-    # validate if we push to main | staging | dev
-    uses: ./.github/workflows/validate.yaml
+  apply:
+    # apply
+    uses: ./.github/workflows/apply.yaml
     with:
         terraform_command: ${{ github.event.inputs.terraform_command || 'init' }}
         environment: ${{ github.event.inputs.environment || 'dev'}}
