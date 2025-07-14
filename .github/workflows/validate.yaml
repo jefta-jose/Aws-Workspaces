@@ -1,0 +1,52 @@
+name: 'Reusable Workflow To Validate Terraform Code'
+
+on:
+    workflow_call:
+        inputs:
+            terraform_command:
+                description: 'Terraform command to run'
+                required: true
+                type: string
+            environment:
+                description: 'Environment for the Terraform code'
+                required: true
+                type: string
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        env:
+            TF_VAR_aws_access_key_id: ${{ secrets.CDC_AWS_ACCESS_KEY_ID }}
+            TF_VAR_aws_secret_access_key: ${{ secrets.CDC_AWS_SECRET_ACCESS_KEY }}
+            TF_VAR_aws_region: ${{ secrets.CDC_AWS_REGION }}
+
+        steps:
+            # checkout the code to the github runner
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            # set up Terragrunt
+            - name: Install Terragrunt
+              uses: gruntwork-io/terragrunt-action@v3
+
+            # Terragrunt Init
+            - name: terragrunt init
+              id: init
+              working-directory: ./terraform/environments/${{ inputs.environment }}
+              run: terragrunt init -input=false
+
+            # Terragrunt Validate
+            - name: terragrunt validate
+              id: validate
+              working-directory: ./terraform/environments/${{ inputs.environment }}
+              run: terragrunt validate
+
+            # Terragrunt Plan
+            - name: terragrunt plan
+              id: plan
+              working-directory: ./terraform/environments/${{ inputs.environment }}
+              run: terragrunt plan
