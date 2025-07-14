@@ -20,9 +20,9 @@ jobs:
     validate:
         runs-on: ubuntu-latest
         env:
-            TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.CDC_AWS_ACCESS_KEY_ID }}
-            TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.CDC_AWS_SECRET_ACCESS_KEY }}
-            TF_VAR_AWS_REGION: ${{ secrets.CDC_AWS_REGION }}
+            TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.TF_VAR_AWS_ACCESS_KEY_ID }}
+            TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_VAR_AWS_SECRET_ACCESS_KEY }}
+            TF_VAR_AWS_REGION: ${{ secrets.TF_VAR_AWS_REGION }}
 
         steps:
             # checkout the code to the github runner
