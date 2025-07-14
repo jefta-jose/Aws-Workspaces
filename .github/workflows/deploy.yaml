@@ -3,11 +3,6 @@
 name: 'Deploy to Environment'
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-      - staging
   workflow_dispatch:
     inputs:
       environment:
@@ -22,7 +17,7 @@ on:
       terraform_command:
         description: 'Select the Terraform command to run'
         required: true
-        default: 'apply'
+        default: 'init'
         type: choice
         options:
           - init
@@ -39,5 +34,5 @@ jobs:
     # validate if we push to main | staging | dev
     uses: ./.github/workflows/validate.yaml
     with:
-        terraform_command: ${{ inputs.terraform_command }}
-        environment: ${{ inputs.environment }}
+        terraform_command: ${{ github.event.inputs.terraform_command || 'init' }}
+        environment: ${{ github.event.inputs.environment || 'dev'}}
