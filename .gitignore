@@ -4,6 +4,9 @@
 **/.terraform/*
 devcontainer.env
 
+# Local .terragrunt-cache directories
+**/.terragrunt-cache/*
+
 # .tfstate files
 *.tfstate
 *.tfstate.*

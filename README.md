@@ -1,5 +1,3 @@
-Here’s an updated and polished version of your `README.md`, incorporating your latest points about DRY principles, Terragrunt benefits, and managing remote state:
-
 ---
 
 ## 🚀 **Terraform S3 + Lambda Event Trigger with Terragrunt**
@@ -44,6 +42,18 @@ terraform-project/
 └── pipeline/
     └── ci-cd.yml                # GitHub Actions or GitLab CI pipeline
 ```
+
+## 📁 Module Path Structure Explained
+
+Terragrunt creates a `.terragrunt-cache` directory during operations such as `init`, `plan`, and `apply`. This cache directory is nested within the environment-specific folder where each Terragrunt configuration is executed.
+
+Because of this, relative paths in `terraform` blocks—especially those referencing shared modules—are evaluated _from within_ the `.terragrunt-cache` directory rather than the actual location of the `terragrunt.hcl` file.
+
+### 🔍 Why the Deep Relative Path?
+
+To correctly locate shared Terraform modules, we use a path like:
+```hcl
+path = "../../../../../../modules/app"
 
 ---
 
@@ -92,9 +102,9 @@ terragrunt run-all destroy
 
 A sample pipeline could:
 
-* Deploy to **`dev`** on `main` branch push
-* Deploy to **`staging`** on PR merge
-* Deploy to **`prod`** on release tag
+* Deploy to **`prod`** on `main` branch push
+* Deploy to **`staging`** on PR merge to staging
+* Deploy to **`dev`** on PR merge to dev
 
 **Secrets**, such as IAM access keys, should be stored securely (e.g., GitHub Secrets, AWS Secrets Manager, Vault).
 
