@@ -1,4 +1,4 @@
-name: 'Reusable Workflow To Validate Terraform Code'
+name: 'plan validate apply'
 
 on:
     workflow_call:
@@ -54,3 +54,9 @@ jobs:
               id: plan
               working-directory: ./terraform/environments/${{ inputs.environment }}
               run: terragrunt plan
+
+            # Terragrunt Plan
+            - name: terragrunt apply
+              id: apply
+              working-directory: ./terraform/environments/${{ inputs.environment }}
+              run: terragrunt apply -auto-approve
