@@ -1,0 +1,38 @@
+# # github action code to deploy code in different environments
+
+# name: 'Deploy to Environment'
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - dev
+#       - staging
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: 'Select the environment to deploy to'
+#         required: true
+#         default: 'dev'
+#         type: choice
+#         options:
+#           - dev
+#           - staging
+#           - prod
+#       terraform_command:
+#         description: 'Select the Terraform command to run'
+#         required: true
+#         default: 'apply'
+#         type: choice
+#         options:
+#           - init
+#           - plan
+#           - apply
+#           - destroy
+
+# defaults:
+#   run:
+#     shell: bash
+
+# jobs:
+#   validate:
