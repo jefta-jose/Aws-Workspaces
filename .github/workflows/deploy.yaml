@@ -36,3 +36,4 @@ jobs:
     with:
         terraform_command: ${{ github.event.inputs.terraform_command || 'init' }}
         environment: ${{ github.event.inputs.environment || 'dev'}}
+    secrets: inherit   
